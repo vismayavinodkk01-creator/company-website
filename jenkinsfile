@@ -1,0 +1,170 @@
+pipeline {
+
+    agent none
+
+    environment {
+        DOCKERHUB_USERNAME = 'DOCKERHUB_USERNAME'
+        DOCKERHUB_REPOSITORY = 'DOCKERHUB_REPOSITORY'
+        DOCKERHUB_CREDENTIAL_ID = 'DOCKERHUB_CREDENTIAL_ID'
+
+        DEPLOYMENT_SERVER_IP = 'DEPLOYMENT_SERVER_IP'
+        DEPLOYMENT_SSH_CREDENTIAL_ID = 'DEPLOYMENT_SSH_CREDENTIAL_ID'
+
+        GITHUB_REPOSITORY_URL = 'GITHUB_REPOSITORY_URL'
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+
+            agent {
+                label 'build-server'
+            }
+
+            steps {
+
+                git branch: '*/main',
+                    url: "${GITHUB_REPOSITORY_URL}"
+
+                echo 'GitHub repository downloaded successfully.'
+            }
+        }
+
+        stage('Build Docker Image') {
+
+            agent {
+                label 'build-server'
+            }
+
+            steps {
+
+                script {
+
+                    env.IMAGE_NAME =
+                        "${DOCKERHUB_USERNAME}/${DOCKERHUB_REPOSITORY}"
+
+                    env.IMAGE_TAG = "${BUILD_NUMBER}"
+
+                    sh """
+                        docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                        docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
+                    """
+                }
+
+                echo 'Docker image built successfully.'
+            }
+        }
+
+        stage('Push Image to Docker Hub') {
+
+            agent {
+                label 'build-server'
+            }
+
+            steps {
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: "${DOCKERHUB_CREDENTIAL_ID}",
+                        usernameVariable: 'DH_USER',
+                        passwordVariable: 'DH_PASSWORD'
+                    )
+                ]) {
+
+                    sh '''
+                        echo "$DH_PASSWORD" |
+                        docker login -u "$DH_USER" --password-stdin
+
+                        docker push "$DOCKERHUB_USERNAME/$DOCKERHUB_REPOSITORY:$BUILD_NUMBER"
+
+                        docker push "$DOCKERHUB_USERNAME/$DOCKERHUB_REPOSITORY:latest"
+
+                        docker logout
+                    '''
+                }
+
+                echo 'Docker image pushed successfully.'
+            }
+        }
+
+        stage('Deploy Application') {
+
+            agent {
+                label 'build-server'
+            }
+
+            steps {
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: "${DOCKERHUB_CREDENTIAL_ID}",
+                        usernameVariable: 'DH_USER',
+                        passwordVariable: 'DH_PASSWORD'
+                    )
+                ]) {
+
+                    sshagent(credentials: [
+                        "${DEPLOYMENT_SSH_CREDENTIAL_ID}"
+                    ]) {
+
+                        sh '''
+                            printf '%s' "$DH_PASSWORD" | ssh \
+                            -o StrictHostKeyChecking=accept-new \
+                            ubuntu@$DEPLOYMENT_SERVER_IP \
+                            "
+                                docker login \
+                                -u '$DH_USER' \
+                                --password-stdin &&
+                                
+                                docker pull \
+                                $DOCKERHUB_USERNAME/$DOCKERHUB_REPOSITORY:$BUILD_NUMBER &&
+                                
+                                docker stop company-website || true
+                                docker rm company-website || true
+
+                                docker run -d \
+                                --name company-website \
+                                --restart unless-stopped \
+                                -p 9090:80 \
+                                $DOCKERHUB_USERNAME/$DOCKERHUB_REPOSITORY:$BUILD_NUMBER &&
+                                
+                                docker logout
+                            "
+
+                        '''
+                    }
+                }
+
+                echo 'Application deployment completed.'
+            }
+        }
+
+        stage('Verify Deployment') {
+
+            agent {
+                label 'build-server'
+            }
+
+            steps {
+
+                sh '''
+                    curl --fail --retry 5 --retry-delay 3 \
+                    http://$DEPLOYMENT_SERVER_IP:9090/
+                '''
+
+                echo 'Website is running successfully!'
+            }
+        }
+    }
+
+    post {
+
+        success {
+            echo 'CI/CD Pipeline completed successfully!'
+        }
+
+        failure {
+            echo 'CI/CD Pipeline failed. Check Jenkins console output.'
+        }
+    }
+}
