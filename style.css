@@ -1,0 +1,276 @@
+
+/* General Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Navigation Bar */
+header {
+    background-color: #10233f;
+    padding: 18px 8%;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    color: white;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 25px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 15px;
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: #62d5d0;
+}
+
+/* Home Section */
+.hero {
+    min-height: 500px;
+    background: linear-gradient(
+        120deg,
+        #10233f,
+        #2864dc
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    padding: 50px 20px;
+}
+
+.hero-content h1 {
+    font-size: 45px;
+    margin-bottom: 20px;
+}
+
+.hero-content p {
+    font-size: 18px;
+    margin-bottom: 30px;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    background-color: #62d5d0;
+    color: #10233f;
+    padding: 12px 28px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background-color: white;
+    transform: translateY(-3px);
+}
+
+/* Common Section Styling */
+.section {
+    padding: 70px 8%;
+    text-align: center;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+}
+
+.section h2 {
+    font-size: 32px;
+    color: #10233f;
+    margin-bottom: 25px;
+}
+
+/* About Section */
+.about {
+    background-color: #f5f7fb;
+}
+
+.about p {
+    max-width: 850px;
+    margin: auto;
+    color: #666;
+    font-size: 17px;
+}
+
+/* Services Section */
+.services {
+    background-color: white;
+}
+
+.service-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-top: 35px;
+}
+
+.service-card {
+    background-color: #f5f7fb;
+    padding: 35px 25px;
+    border-radius: 10px;
+    border-bottom: 4px solid #2864dc;
+    transition: 0.3s;
+}
+
+.service-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.service-card h3 {
+    color: #2864dc;
+    margin-bottom: 15px;
+}
+
+.service-card p {
+    color: #666;
+}
+
+/* Why Choose Us Section */
+.why-us {
+    background-color: #10233f;
+}
+
+.why-us h2 {
+    color: white;
+}
+
+.why-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-top: 35px;
+}
+
+.why-card {
+    background-color: #1c385e;
+    padding: 30px 20px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.why-card:hover {
+    background-color: #2864dc;
+    transform: translateY(-5px);
+}
+
+.why-card h3 {
+    color: #62d5d0;
+    margin-bottom: 12px;
+}
+
+.why-card p {
+    color: white;
+}
+
+/* Contact Section */
+.contact {
+    background-color: #f5f7fb;
+}
+
+.contact p {
+    margin: 12px 0;
+    color: #555;
+}
+
+.contact .btn {
+    margin-top: 15px;
+}
+
+/* Footer */
+footer {
+    background-color: #0b1a30;
+    color: white;
+    text-align: center;
+    padding: 22px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+
+    header {
+        padding: 18px 5%;
+    }
+
+    .navbar {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .hero-content h1 {
+        font-size: 32px;
+    }
+
+    .service-container,
+    .why-container {
+        grid-template-columns: 1fr;
+    }
+
+    .section {
+        padding: 55px 5%;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .logo {
+        font-size: 23px;
+    }
+
+    .nav-links {
+        gap: 10px 15px;
+    }
+
+    .nav-links a {
+        font-size: 13px;
+    }
+
+    .hero-content h1 {
+        font-size: 28px;
+    }
+
+    .hero-content p {
+        font-size: 16px;
+    }
+
+    .section h2 {
+        font-size: 26px;
+    }
+}
