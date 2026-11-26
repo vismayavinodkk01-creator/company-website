@@ -16,7 +16,7 @@ pipeline {
         DEPLOYMENT_SERVER_IP = '13.207.203.210'
 
         // GitHub Configuration
-        GITHUB_REPOSITORY_URL = 'https://github.com/minhajcp2003-svg/company-website.git'
+        GITHUB_REPOSITORY_URL = 'https://github.com/vismayavinodkk01-creator/company-website.git'
 
         // Application Configuration
         APP_NAME = 'company-website'
